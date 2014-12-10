@@ -136,7 +136,7 @@ function startup(aData, aReason) {
 					mouseY1 = e.pageY;
 				  //console.log('mouseX1:', e.pageX);
 				  //console.log('mouseY1:', e.pageY);
-					  var width = parseInt(cDoc.querySelector('.width-copy .value').textContent);
+					var width = parseInt(cDoc.querySelector('.width-copy .value').textContent);
 					var height = parseInt(cDoc.querySelector('.height-copy .value').textContent);
 				  
 				  //console.log('mouseXDiff:', mouseX1-mouseX0, 'failWidth:', mouseX1-mouseX0-width);
@@ -146,67 +146,10 @@ function startup(aData, aReason) {
 				can.addEventListener('mousedown', function(e) {
 				  can.addEventListener('mousemove', trackPageXY, false);
 				  delayIt = cWin.setTimeout(function() {
-					 mouseX0 = e.pageX;
-					mouseY0 = e.pageY;
-					 //console.log('mouseX0:',e.pageX);
-					 //console.log('mouseY0', e.pageY);
-					
-					 var point = new struct_lpPoint;
-					 var ret = GetCursorPos(point.address());
-					if (!ret) {
-					  //console.warn('failed to get cursor pos')
-					  return;
-					}
-					//console.log('point:', point.x, point.y);
-
 					var width = parseInt(cDoc.querySelector('.width-copy .value').textContent);
 					var height = parseInt(cDoc.querySelector('.height-copy .value').textContent);
-					
-					//console.log('width:', width, 'height:', height);
-					
-					var xOffset = 0;
-					moveTillPageXRight = cWin.setInterval(function() {
-					  if (xOffset > 0 && mouseX1-mouseX0-width >= 0) {
-						cWin.clearInterval(moveTillPageXRight);
-						//console.log('reached proper width')
-						//now move to get y right
-						var yOffset = 0;
-						moveTillPageYRight = cWin.setInterval(function() {
-						  if (yOffset > 0 && mouseY1-mouseY0-height >= 0) {
-							//console.log('reached proper height');
-							cWin.clearInterval(moveTillPageYRight);
-							return;
-						  }
-						  yOffset++;
-						  var ret = SetCursorPos(point.x + xOffset, point.y + yOffset);
-						  if (!ret) {
-							//console.warn('failed to set cursor pos');
-							return;
-						  }
-						}, 10);
-						//end nw move to get y right
-						return;
-					  }
-					  xOffset++;
-					  var ret = SetCursorPos(point.x + xOffset, point.y);
-					  if (!ret) {
-						//console.warn('failed to set cursor pos');
-						return;
-					  }
-					}, 10);
-					
-
-
-					
-					/*
-					//for some reason this is offset so not accurate
-					//console.log('move to:', point.x + width, point.y + height)
-					var ret = SetCursorPos(point.x + width, point.y + height);
-					if (!ret) {
-					  //console.warn('failed to set cursor pos');
-					  return;
-					}
-					*/
+					var utils = cWin.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowUtils);
+					utils.sendMouseEvent('mousemove',e.pageX + width,e.pageY + height, 0, 1, 0);
 				  }, 1000);
 				}, false)
 				
