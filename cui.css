@@ -1,0 +1,9 @@
+@-moz-document url("chrome://browser/content/browser.xul") {
+	#hopg_cui {
+		list-style-image: url('chrome://hand-of-pixel-god/content/icon16.png');
+	}
+	#hopg_cui[cui-areatype="menu-panel"],
+	toolbarpaletteitem[place="palette"] > #hopg_cui {
+		list-style-image: url('chrome://hand-of-pixel-god/content/icon32.png');
+	}
+}
