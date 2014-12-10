@@ -212,16 +212,73 @@ function startup(aData, aReason) {
 					  }, 1000);
 					}, false);
 				} else {
-				  	//mac or nix
-				  	var can = cDoc.querySelector('section[id=canvas]');
+				  	//mac or nix					
+					var can = cDoc.querySelector('section[id=canvas]');
+
+					var moveTillPageXRight;
+					var moveTillPageYRight;
+					var delayIt;
+	
+					can.addEventListener('mouseup', function(e) {
+					  
+					  try {
+					   cWin.clearTimeout(delayIt);
+					   cWin.clearInterval(moveTillPageXRight);
+					   cWin.clearInterval(moveTillPageYRight);
+					  } catch (ignore) {}
+					  
+					}, false);
+					
+					var utils = cWin.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowUtils);
+						
 					can.addEventListener('mousedown', function(e) {
 					  delayIt = cWin.setTimeout(function() {
+	
 						var width = parseInt(cDoc.querySelector('.width-copy .value').textContent);
 						var height = parseInt(cDoc.querySelector('.height-copy .value').textContent);
-						var utils = cWin.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowUtils);
-						utils.sendMouseEvent('mousemove',e.pageX + width,e.pageY + height, 0, 1, 0);
+						
+						//console.log('width:', width, 'height:', height);
+						
+						var xOffset = 0;
+						moveTillPageXRight = cWin.setInterval(function() {
+						  if (xOffset > 0 && (e.pageX + xOffset)-e.pageX-width >= 0) {
+							cWin.clearInterval(moveTillPageXRight);
+							//console.log('reached proper width')
+							//now move to get y right
+							var yOffset = 0;
+							moveTillPageYRight = cWin.setInterval(function() {
+							  if (yOffset > 0 && (e.pageY + yOffset)-e.pageY-height >= 0) {
+								//console.log('reached proper height');
+								cWin.clearInterval(moveTillPageYRight);
+								return;
+							  }
+							  yOffset++;
+							  utils.sendMouseEvent('mousemove',e.pageX + xOffset,e.pageY + yOffset, 0, 1, 0);
+							  //console.log('ymove');
+							}, 10);	
+							//end nw move to get y right
+							return;
+						  }
+						  xOffset++;
+						  utils.sendMouseEvent('mousemove',e.pageX + xOffset,e.pageY, 0, 1, 0);
+						  //console.log('xmove');
+						}, 10);
+						
+	
+	
+						
+						/*
+						//for some reason this is offset so not accurate
+						//console.log('move to:', point.x + width, point.y + height)
+						var ret = SetCursorPos(point.x + width, point.y + height);
+						if (!ret) {
+						  //console.warn('failed to set cursor pos');
+						  return;
+						}
+						*/
 					  }, 1000);
-					}, false)
+					}, false);
+					
 				}
 				
 			} else {
